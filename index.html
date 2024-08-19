@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Machine Learning Model</title>
+</head>
+<body style="background-image: url('{{background_path}}');">
+<!--<body style="background-color:#ADD8E6;">  -->
+<!-- https://www.w3.org/wiki/CSS/Properties/color/keywords -->
+{% if image_path %}
+<img src="{{ image_path }}" align="right" width="25%" height="25%" alt="Image not Found" ><br>
+{% endif %}
+<form method="POST" action="{{ url_for('model') }}">
+    <label for="models"><b>Choose a model:</b></label>
+    <select name="models" id="models">
+        <option hidden disabled selected value></option>
+
+        {% if model == "svm" %}
+        <option value="svm" selected>SVM</option>
+        {% else %}
+        <option value="svm">SVM</option>
+        {% endif %}
+
+        {% if model == "random_forest" %}
+        <option value="random_forest" selected>Random Forest</option>
+        {% else %}
+        <option value="random_forest">Random Forest</option>
+        {% endif %}
+
+        {% if model == "xgboost" %}
+        <option value="xgboost" selected>XGBoost</option>
+        {% else %}
+        <option value="xgboost">XGBoost</option>
+        {% endif %}
+
+        {% if model == "mlp" %}
+        <option value="mlp" selected>MLP</option>
+        {% else %}
+        <option value="mlp">MLP</option>
+        {% endif %}
+
+        {% if model == "linear" %}
+        <option value="linear" selected>Linear</option>
+        {% else %}
+        <option value="linear">Linear</option>
+        {% endif %}
+
+        {% if model == "lasso" %}
+        <option value="lasso" selected>Lasso</option>
+        {% else %}
+        <option value="lasso">Lasso</option>
+        {% endif %}
+
+    </select> &nbsp &nbsp &nbsp
+
+    <label for="age"><b>Age (years):</b></label>
+    {% if age %}
+    <input type="number" id="age" name="age" value="{{ age }}" style="width: 5em">
+    {% else %}
+    <input type="number" id="age" name="age" style="width: 5em">
+    {% endif %}
+     &nbsp &nbsp &nbsp
+
+    <label for="gender"><b>Gender:</b></label>
+    <select name="gender" id="gender">
+        <option hidden disabled selected value></option>
+
+        {% if gender == "male" %}
+        <option value="male" selected>Male</option>
+        {% else %}
+        <option value="male">Male</option>
+        {% endif %}
+
+        {% if gender == "female" %}
+        <option value="female" selected>Female</option>
+        {% else %}
+        <option value="female" >Female</option>
+        {% endif %}
+    </select><br><br>
+
+    <table>
+        <tr>
+            <td style="width:57%">
+                <b>LEFT EYE:</b><br><br>
+
+                <label for="glasses_left"><b>Wearing Refractive Correction:</b></label>
+                    <select name="glasses_left" id="glasses_left">
+                        <option hidden disabled selected value></option>
+                        {% if glasses_left == "yes" %}
+                            <option value="yes" selected>Yes</option>
+                        {% else %}
+                            <option value="yes">Yes</option>
+                        {% endif %}
+
+                        {% if glasses_left == "no" %}
+                        <option value="no" selected>No</option>
+                        {% else %}
+                        <option value="no" >No</option>
+                        {% endif %}
+                    </select><br><br>
+
+                <label for="sphe_left"><b>Non-Cycloplegic Spherical Equivalent (D):</b></label>
+                    {% if sphe_left %}
+                    <input type="number" step="any" id="sphe_left" name="sphe_left" value="{{ sphe_left }}" style="width: 5em"><br>
+                    {% else %}
+                    <input type="number" step="any" id="sphe_left" name="sphe_left" style="width: 5em"><br>
+                    {% endif %}
+                    <b>OR</b><br>
+                <label for="sphere_left"><b>Sphere (D):</b></label>
+                {% if sphere_left %}
+                <input type="number" step="any" id="sphere_left" name="sphere_left" value="{{ sphere_left }}" style="width: 5em">
+                {% else %}
+                <input type="number" step="any" id="sphere_left" name="sphere_left" style="width: 5em">
+                {% endif %}
+                <label for="cylinder_left"><b>&nbsp&nbsp&nbsp&nbsp Cylinder (D):</b></label>
+                {% if cylinder_left %}
+                <input type="number" step="any" id="cylinder_left" name="cylinder_left" value="{{ cylinder_left }}" style="width: 5em"><br>
+                {% else %}
+                <input type="number" step="any" id="cylinder_left" name="cylinder_left" style="width: 5em"><br>
+                {% endif %}
+                {% if sphere_left and cylinder_left and not input_error%}
+                <b>Calculated Non-Cycloplegic Spherical Equivalent (D):</b> {{app_sphe_left}}<br>
+                {% endif %}
+                <br>
+
+                <label for="ucva_snellen_left"><b>Uncorrected Visual Acuity (Snellen):</b> &nbsp&nbsp20/</label>
+                {% if ucva_snellen_left %}
+                <input type="number" step="any" id="ucva_snellen_left" name="ucva_snellen_left" value="{{ ucva_snellen_left }}" style="width: 5em">
+                {% if not input_error_left %}
+                <b>(logMAR:</b> {{app_ucva_logmar_left}}<b>)</b>
+                {% endif %}
+                <br>
+                {% else %}
+                <input type="number" step="any" id="ucva_snellen_left" name="ucva_snellen_left" style="width: 5em"><br>
+                {% endif %}
+
+                <b>OR</b><br>
+
+                <label for="ucva_logmar_left"><b>Uncorrected Visual Acuity (logMAR):</b></label>
+                {% if ucva_logmar_left %}
+                <input type="number" step="any" id="ucva_logmar_left" name="ucva_logmar_left" value="{{ ucva_logmar_left }}" style="width: 5em">
+                {% if not input_error_left %}
+                <b>(Snellen:</b> 20/{{app_ucva_snellen_left}}<b>)</b>
+                {% endif %}
+                <br><br>
+                {% else %}
+                <input type="number" step="any" id="ucva_logmar_left" name="ucva_logmar_left" style="width: 5em"><br><br>
+                {% endif %}
+
+
+                <label for="al_cr_ratio_left"><b>Ratio of Axial Length to Corneal Curvature Radius:</b></label>
+                {% if al_cr_ratio_left %}
+                <input type="number" step="any" id="al_cr_ratio_left" name="al_cr_ratio_left" value="{{ al_cr_ratio_left }}" style="width: 5em"><br>
+                {% else %}
+                <input type="number" step="any" id="al_cr_ratio_left" name="al_cr_ratio_left" style="width: 5em"><br>
+                {% endif %}
+
+                <b>OR</b><br>
+
+                <label for="al_left"><b>Axial Length:</b></label>
+                {% if al_left %}
+                <input type="number" step="any" id="al_left" name="al_left" value="{{ al_left }}" style="width: 5em">
+                {% else %}
+                <input type="number" step="any" id="al_left" name="al_left" style="width: 5em">
+                {% endif %}
+
+                <label for="cr_left"><b>&nbsp&nbsp&nbsp&nbsp Corneal Curvature Radius:</b></label>
+                {% if cr_left %}
+                <input type="number" step="any" id="cr_left" name="cr_left" value="{{ cr_left }}" style="width: 5em"><br>
+                {% else %}
+                <input type="number" step="any" id="cr_left" name="cr_left" style="width: 5em"><br>
+                {% endif %}
+
+                {% if al_left and cr_left and not input_error_left%}
+                <b>Calculated Ratio of Axial Length to Corneal Curvature Radius:</b> {{app_al_cr_ratio_left}}<br>
+                {% endif %}
+                <br>
+
+
+                <label for="iop_left"><b>Intraocular Pressure:</b></label>
+                {% if iop_left %}
+                <input type="number" step="any" id="iop_left" name="iop_left" value="{{ iop_left }}" style="width: 5em"><br><br>
+                {% else %}
+                <input type="number" step="any" id="iop_left" name="iop_left" style="width: 5em"><br><br>
+                {% endif %}
+                <br>
+                <button type="submit">Go</button>
+
+                <hr>
+
+                {% if sphe_error_left %}
+                <b>Should only fill out Non-Cycloplegic Spherical Equivalent OR Sphere and Cylinder.</b><br>
+                {% endif %}
+                {% if ucva_error_left %}
+                <b>Should only fill out Uncorrected Visual Acuity in Snellen OR logMAR.</b><br>
+                {% endif %}
+                {% if al_cr_error_left %}
+                <b>Should only fill out Ratio of Axial Length to Corneal Curvature Radius OR Axial Length and Corneal Curvature Radius.</b><br>
+                {% endif %}
+                {% if unfilled_error_left %}
+                <b>Not everything is filled out.</b><br>
+                {% endif %}
+                {% if cycloplegic_prediction_left != "None" %}
+                <b>Predicted Cycloplegic Refractive Error:</b> {{ cycloplegic_prediction_left }} D<br>
+                {% endif %}
+                {% if myopia_prediction_left != "None" %}
+                <b>Predicted Probability of Myopia:</b> {{myopia_prediction_probability_left}}
+                {% endif %}
+            </td>
+
+
+            <td style="width:60%">
+                <b>RIGHT EYE:</b><br><br>
+
+                <label for="glasses_right"><b>Wearing Refractive Correction:</b></label>
+                    <select name="glasses_right" id="glasses_right">
+                        <option hidden disabled selected value></option>
+                        {% if glasses_right == "yes" %}
+                            <option value="yes" selected>Yes</option>
+                        {% else %}
+                            <option value="yes">Yes</option>
+                        {% endif %}
+
+                        {% if glasses_right == "no" %}
+                        <option value="no" selected>No</option>
+                        {% else %}
+                        <option value="no" >No</option>
+                        {% endif %}
+                    </select><br><br>
+
+                <label for="sphe_right"><b>Non-Cycloplegic Spherical Equivalent (D):</b></label>
+                {% if sphe_right %}
+                <input type="number" step="any" id="sphe_right" name="sphe_right" value="{{ sphe_right }}" style="width: 5em"><br>
+                {% else %}
+                <input type="number" step="any" id="sphe_right" name="sphe_right" style="width: 5em"><br>
+                {% endif %}
+                <b>OR</b><br>
+                <label for="sphere_right"><b>Sphere (D):</b></label>
+                {% if sphere_right %}
+                <input type="number" step="any" id="sphere_right" name="sphere_right" value="{{ sphere_right }}" style="width: 5em">
+                {% else %}
+                <input type="number" step="any" id="sphere_right" name="sphere_right" style="width: 5em">
+                {% endif %}
+                <label for="cylinder_right"><b>&nbsp&nbsp&nbsp&nbsp Cylinder (D):</b></label>
+                {% if cylinder_right %}
+                <input type="number" step="any" id="cylinder_right" name="cylinder_right" value="{{ cylinder_right }}" style="width: 5em"><br>
+                {% else %}
+                <input type="number" step="any" id="cylinder_right" name="cylinder_right" style="width: 5em"><br>
+                {% endif %}
+                {% if sphere_right and cylinder_right and not input_error%}
+                <b>Calculated Non-Cycloplegic Spherical Equivalent (D):</b> {{app_sphe_right}}<br>
+                {% endif %}
+                <br>
+
+                <label for="ucva_snellen_right"><b>Uncorrected Visual Acuity (Snellen):</b> &nbsp&nbsp20/</label>
+                {% if ucva_snellen_right %}
+                <input type="number" step="any" id="ucva_snellen_right" name="ucva_snellen_right" value="{{ ucva_snellen_right }}" style="width: 5em">
+                {% if not input_error_right %}
+                <b>(logMAR:</b> {{app_ucva_logmar_right}}<b>)</b>
+                {% endif %}
+                <br>
+                {% else %}
+                <input type="number" step="any" id="ucva_snellen_right" name="ucva_snellen_right" style="width: 5em"><br>
+                {% endif %}
+
+                <b>OR</b><br>
+
+                <label for="ucva_logmar_right"><b>Uncorrected Visual Acuity (logMAR):</b></label>
+                {% if ucva_logmar_right %}
+                <input type="number" step="any" id="ucva_logmar_right" name="ucva_logmar_right" value="{{ ucva_logmar_right }}" style="width: 5em">
+                {% if not input_error_right %}
+                <b>(Snellen:</b> 20/{{app_ucva_snellen_right}}<b>)</b>
+                {% endif %}
+                <br><br>
+                {% else %}
+                <input type="number" step="any" id="ucva_logmar_right" name="ucva_logmar_right" style="width: 5em"><br><br>
+                {% endif %}
+
+
+                <label for="al_cr_ratio_right"><b>Ratio of Axial Length to Corneal Curvature Radius:</b></label>
+                {% if al_cr_ratio_right %}
+                <input type="number" step="any" id="al_cr_ratio_right" name="al_cr_ratio_right" value="{{ al_cr_ratio_right }}" style="width: 5em"><br>
+                {% else %}
+                <input type="number" step="any" id="al_cr_ratio_right" name="al_cr_ratio_right" style="width: 5em"><br>
+                {% endif %}
+
+                <b>OR</b><br>
+
+                <label for="al_right"><b>Axial Length:</b></label>
+                {% if al_right %}
+                <input type="number" step="any" id="al_right" name="al_right" value="{{ al_right }}" style="width: 5em">
+                {% else %}
+                <input type="number" step="any" id="al_right" name="al_right" style="width: 5em">
+                {% endif %}
+
+                <label for="cr_right"><b>&nbsp&nbsp&nbsp&nbsp Corneal Curvature Radius:</b></label>
+                {% if cr_right %}
+                <input type="number" step="any" id="cr_right" name="cr_right" value="{{ cr_right }}" style="width: 5em"><br>
+                {% else %}
+                <input type="number" step="any" id="cr_right" name="cr_right" style="width: 5em"><br>
+                {% endif %}
+
+                {% if al_right and cr_right and not input_error_right%}
+                <b>Calculated Ratio of Axial Length to Corneal Curvature Radius:</b> {{app_al_cr_ratio_right}}<br>
+                {% endif %}
+                <br>
+
+                <label for="iop_right"><b>Intraocular Pressure:</b></label>
+                {% if iop_right %}
+                <input type="number" step="any" id="iop_right" name="iop_right" value="{{ iop_right }}" style="width: 5em"><br><br>
+                {% else %}
+                <input type="number" step="any" id="iop_right" name="iop_right" style="width: 5em"><br><br>
+                {% endif %}
+                <br>
+                <hr>
+
+                {% if sphe_error_right %}
+                <b>Should only fill out Non-Cycloplegic Spherical Equivalent OR Sphere and Cylinder.</b><br>
+                {% endif %}
+                {% if ucva_error_right %}
+                <b>Should only fill out Uncorrected Visual Acuity in Snellen OR logMAR.</b><br>
+                {% endif %}
+                {% if al_cr_error_right %}
+                <b>Should only fill out Ratio of Axial Length to Corneal Curvature Radius OR Axial Length and Corneal Curvature Radius.</b><br>
+                {% endif %}
+                {% if unfilled_error_right %}
+                <b>Not everything is filled out.</b><br>
+                {% endif %}
+                {% if cycloplegic_prediction_right != "None" %}
+                <b>Predicted Cycloplegic Refractive Error:</b> {{ cycloplegic_prediction_right }} D<br>
+                {% endif %}
+                {% if myopia_prediction_right != "None" %}
+                <b>Predicted Probability of Myopia:</b> {{myopia_prediction_probability_right}}
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
